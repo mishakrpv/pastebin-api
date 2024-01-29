@@ -26,7 +26,7 @@ namespace FunctionalsTests.WebApi.Controllers
             getResponse.EnsureSuccessStatusCode();
             var stringResponse = await getResponse.Content.ReadAsStringAsync();
 
-            Assert.Contains("Link has expired", stringResponse);
+            Assert.Contains("Key has expired", stringResponse);
         }
 
         [Fact]

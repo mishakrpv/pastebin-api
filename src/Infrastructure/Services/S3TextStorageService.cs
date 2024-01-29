@@ -117,7 +117,7 @@ namespace Infrastructure.Services
                     return new GetObjectResponseDto<TextObject>()
                         {
                             StatusCode = 200,
-                            Message = "Link has expired"
+                            Message = "Key has expired"
                         };
                 }
             }
