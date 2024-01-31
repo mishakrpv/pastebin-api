@@ -4,15 +4,15 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace IntegrationTests.Cache
 {
-    public class HashCacheAdapterTests
+    public class CacheAdapterTests
     {
         private readonly MemoryCache _memoryCache;
-        private readonly HashCacheAdapter _hashCache;
+        private readonly CacheAdapter<List<string>> _hashCache;
 
-        public HashCacheAdapterTests()
+        public CacheAdapterTests()
         {
             _memoryCache = new MemoryCache(new MemoryCacheOptions());
-            _hashCache = new HashCacheAdapter(_memoryCache);
+            _hashCache = new CacheAdapter<List<string>>(_memoryCache);
         }
 
         [Fact]

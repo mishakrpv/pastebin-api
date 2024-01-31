@@ -18,7 +18,7 @@ namespace WebApi.Configuration
             
             services.AddScoped<IObjectStorageService<TextObject>, S3TextStorageService>();
             
-            services.AddSingleton<IAppCache<List<string>>, HashCacheAdapter>();
+            services.AddSingleton(typeof(IAppCache<>), typeof(CacheAdapter<>));
             services.AddSingleton<IHashGenerator, HashGenerator>();
 
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));

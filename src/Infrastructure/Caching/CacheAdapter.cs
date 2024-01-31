@@ -3,21 +3,21 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Infrastructure.Caching
 {
-    public class HashCacheAdapter : IAppCache<List<string>>
+    public class CacheAdapter<T> : IAppCache<T> where T : notnull
     {
         private readonly IMemoryCache _memoryCache;
         
-        public HashCacheAdapter(IMemoryCache memoryCache)
+        public CacheAdapter(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
         }
 
-        public List<string>? Get(object key)
+        public T? Get(object key)
         {
-            return (List<string>?)_memoryCache.Get(key);
+            return (T?)_memoryCache.Get(key);
         }
 
-        public void Set(object key, List<string> value)
+        public void Set(object key, T value)
         {
             _memoryCache.Set(key, value);
         }
