@@ -22,23 +22,27 @@ namespace Infrastructure.Services
         private readonly IAppLogger<S3TextStorageService> _logger;
         private readonly IRepository<ObjectDetails> _objectDetailsRepository;
         private readonly IHashGenerator _hashGenerator;
+        private readonly IAppCache<TextObject> _cache;
 
         public S3TextStorageService(
             IOptions<AwsCredentials> options,
             IAppLogger<S3TextStorageService> logger,
             IRepository<ObjectDetails> objectDetailsRepository,
-            IHashGenerator hashGenerator)
+            IHashGenerator hashGenerator,
+            IAppCache<TextObject> cache)
         {
             var credentials = options.Value;
             _credentials = new BasicAWSCredentials(credentials.AwsKey, credentials.AwsSecretKey);
             _logger = logger;
             _objectDetailsRepository = objectDetailsRepository;
             _hashGenerator = hashGenerator;
+            _cache = cache;
         }
 
         public async Task<UploadObjectResponseDto> UploadAsync(TextObject objectItem, int lifetimeInMinutes)
         {
             string key = await _hashGenerator.GetHashAsync();
+            _cache.Set(key, objectItem);
             var response = await UploadToS3Async(objectItem.ContentBody, key);
 
             if (response.StatusCode == 200)
@@ -99,7 +103,12 @@ namespace Infrastructure.Services
             {
                 if (objectDetails.Expiration > DateTime.UtcNow)
                 {
-                    var response = await GetFromS3Async(key);
+                    var response = TryGetCachedText(key, out TextObject? result) ? new()
+                    {
+                        Object = result,
+                        StatusCode = 200,
+                        Message = $"{key} object read successfully"
+                    } : await GetFromS3Async(key);
 
                     if (response.StatusCode == 200)
                     {
@@ -167,6 +176,20 @@ namespace Infrastructure.Services
             }
 
             return responseDto;
+        }
+
+        public bool TryGetCachedText(string key, out TextObject? result)
+        {
+            result = _cache.Get(key);
+
+            if (result != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
