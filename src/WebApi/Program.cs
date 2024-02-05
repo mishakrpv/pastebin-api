@@ -10,13 +10,18 @@ builder.Logging.AddConsole();
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 
-//builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-
-builder.Services.AddDbContext<AppDbContext>(c =>
+if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Docker")
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    c.UseNpgsql(connectionString, options => options.EnableRetryOnFailure());
-});
+    builder.Services.AddDbContext<AppDbContext>(c => c.UseInMemoryDatabase("pastebindb"));
+}
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(c =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
+        c.UseNpgsql(connectionString, options => options.EnableRetryOnFailure());
+    });
+}
 
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddOptions(builder.Configuration);
@@ -24,6 +29,8 @@ builder.Services.AddOptions(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
