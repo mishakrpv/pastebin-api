@@ -12,7 +12,7 @@ namespace Infrastructure.Services
 {
     public class S3TextStorageService : IObjectStorageService<TextObject>
     {
-        private string _backetName = "pastebinapi";
+        private string _bucketName = "pastebinapi";
 
         private readonly AWSCredentials _credentials;
         private readonly AmazonS3Config _configsS3 = new AmazonS3Config()
@@ -69,7 +69,7 @@ namespace Infrastructure.Services
             {
                 ContentBody = contentBody,
                 Key = key,
-                BucketName = _backetName,
+                BucketName = _bucketName,
                 CannedACL = S3CannedACL.NoACL,
             };
 
@@ -149,7 +149,7 @@ namespace Infrastructure.Services
             var getRequest = new GetObjectRequest()
             {
                 Key = key,
-                BucketName = _backetName,
+                BucketName = _bucketName,
             };
 
             try
